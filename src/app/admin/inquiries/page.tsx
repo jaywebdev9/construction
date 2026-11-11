@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import { inquiries as initial } from "@/lib/mock-data";
 import type { Inquiry } from "@/types";
 import { cn } from "@/lib/utils";

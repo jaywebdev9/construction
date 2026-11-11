@@ -52,7 +52,7 @@ export function MultiStepQuoteForm() {
 
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  const onSubmit = async (_data: FormData) => {
+  const onSubmit = async () => {
     await new Promise((r) => setTimeout(r, 800));
     setRef(`DEMO-${Date.now().toString(36).toUpperCase()}`);
     setDone(true);
