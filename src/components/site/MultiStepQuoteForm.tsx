@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
+import { submitQuoteAction } from "@/app/actions/quote";
 
 const schema = z.object({
   name: z.string().min(2, "Required"),
@@ -53,22 +54,35 @@ export function MultiStepQuoteForm() {
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const onSubmit = async () => {
-    await new Promise((r) => setTimeout(r, 800));
-    setRef(`DEMO-${Date.now().toString(36).toUpperCase()}`);
-    setDone(true);
+    const values = getValues();
+    const result = await submitQuoteAction({
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      company: values.company,
+      projectType: values.projectType,
+      location: values.location,
+      scope: values.scope,
+      budget: values.budget,
+      timeline: values.timeline,
+    });
+    if (result.ok) {
+      setRef(result.reference);
+      setDone(true);
+    }
   };
 
   if (done) {
     return (
       <div className="card-surface p-8 text-center">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-amber">
-          Demo submission
+          Request received
         </p>
         <h2 className="mt-3 font-display text-2xl font-semibold">
           Request received
         </h2>
         <p className="mt-3 text-charcoal/70">
-          Your demo reference number is{" "}
+          Your reference number is{" "}
           <strong className="text-charcoal">{ref}</strong>. No data was sent to
           a server.
         </p>
@@ -280,8 +294,7 @@ export function MultiStepQuoteForm() {
               </div>
             </dl>
             <p className="text-xs text-charcoal/50">
-              Submitting will only show a demo success state. No email or CRM
-              integration.
+              Your request will be stored securely and our team will follow up.
             </p>
           </div>
         )}

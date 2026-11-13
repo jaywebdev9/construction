@@ -1,19 +1,20 @@
 import type { SiteSettings } from "@/types";
 
+/** Fallback when database is unavailable. Prefer getSiteSettings() from DAL. */
 export const siteSettings: SiteSettings = {
-  companyName: "[Company Name]",
+  companyName: "Amani Construction Ltd",
   tagline: "Precision. Craft. Delivery.",
   description:
-    "A construction and civil engineering firm delivering quality buildings and infrastructure with disciplined project management and a commitment to safety.",
-  address: "[Office Address], [City], Tanzania",
-  phone: "[Phone Number]",
-  email: "[Email Address]",
-  whatsapp: undefined, // set placeholder when available
+    "Amani Construction Ltd delivers quality buildings and civil infrastructure across Tanzania and East Africa with disciplined project management, safety leadership, and lasting craftsmanship.",
+  address: "Plot 12, Ohio Street, Dar es Salaam, Tanzania",
+  phone: "+255 22 211 4500",
+  email: "info@amaniconstruction.co.tz",
+  whatsapp: undefined,
   officeHours: "Monday – Friday, 08:00 – 17:00",
   social: {
-    linkedin: "#",
-    facebook: "#",
-    instagram: "#",
+    linkedin: "https://www.linkedin.com/",
+    facebook: "https://www.facebook.com/",
+    instagram: undefined,
   },
-  registrationDetails: "[Registration Details]",
+  registrationDetails: "Registered in the United Republic of Tanzania",
 };

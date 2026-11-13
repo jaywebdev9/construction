@@ -68,8 +68,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-900">
-          Demo data — not connected to a backend
+        <div className="border-b border-slate-100 px-4 py-2 text-xs text-slate-500">
+          Amani Construction — Admin
         </div>
         <nav className="flex-1 overflow-y-auto p-3">
           {nav.map((item) => {
@@ -97,13 +97,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="border-t border-slate-200 p-3">
-          <Link
-            href="/admin/login"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign out (demo)
-          </Link>
+          <form action="/api/auth/logout" method="post">
+            <button
+              type="submit"
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          </form>
         </div>
       </aside>
 

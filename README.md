@@ -1,89 +1,97 @@
-# Premium Construction Company — Frontend
+# Amani Construction Ltd — Web Platform
 
-Frontend-only implementation of a public website and admin dashboard for a construction / civil engineering firm.
+Production-oriented Next.js 15 application for **Amani Construction Ltd** (Tanzania / East Africa): public marketing site + secured admin dashboard with PostgreSQL backend.
 
-**Design direction:** Premium Industrial Editorial  
-**Stack:** Next.js 15 (App Router), React 18, TypeScript, Tailwind CSS, React Hook Form, Zod, Lucide React
+## Stack
 
-## Quick start
+- Next.js 15 App Router, React 18, TypeScript, Tailwind CSS
+- PostgreSQL + Prisma ORM
+- Cookie sessions (HttpOnly), bcrypt password hashing
+- Server Actions for contact/quote submissions and login
+- Zod validation on client and server
+
+## Quick start (local)
+
+1. **PostgreSQL** — create a database, then:
+
+```bash
+cp .env.example .env
+# Set DATABASE_URL and AUTH_SECRET in .env
+```
+
+2. **Install & migrate**
 
 ```bash
 npm install
+npx prisma migrate dev --name init
+npm run db:seed
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+3. Open http://localhost:3000  
+   Admin: http://localhost:3000/admin/login  
 
-Admin: [http://localhost:3000/admin/login](http://localhost:3000/admin/login) — any email/password works (demo only).
+**Seeded admin (change immediately):**  
+- Email: `admin@amaniconstruction.co.tz`  
+- Password: `ChangeMeNow!2026`
 
-```bash
-npm run build
-npm run typecheck
-npm run lint
+## Scripts
+
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build (`prisma generate` + `next build`) |
+| `npm run db:migrate` | Run migrations |
+| `npm run db:seed` | Seed settings, content, admin user |
+| `npm run db:studio` | Prisma Studio |
+| `npm run typecheck` | TypeScript check |
+| `npm run lint` | ESLint |
+
+## What is production-ready
+
+- Real password authentication (no “any password” demo login)
+- Admin routes gated by session middleware + server session checks
+- Contact and quote forms persist to PostgreSQL with unique references
+- Role/permission matrix helpers (`src/server/auth/permissions.ts`)
+- Audit log table for sensitive actions
+- Prisma schema with indexes, enums, FKs
+- `.env.example` without secrets
+
+## What still needs external configuration
+
+Wire these for full production ops (adapters are documented; values are env-driven):
+
+- Managed PostgreSQL with backups and TLS
+- Resend (or similar) for inquiry notification emails + outbox retries
+- Cloudflare R2 for media uploads (presigned URLs)
+- Redis-compatible store for distributed rate limiting
+- Sentry (or equivalent) for error monitoring
+- Custom domain, HTTPS, DNS, verified sender domain
+
+## Security notes
+
+- Never commit `.env`
+- Change the seeded admin password on first login
+- Rotate `AUTH_SECRET` if compromised
+- Do not expose `DATABASE_URL` or storage secrets via `NEXT_PUBLIC_*`
+- Production cookies use `Secure` when `NODE_ENV=production`
+
+## Project structure (backend)
+
+```
+prisma/                 schema + seed
+src/server/
+  auth/                 session, permissions
+  db/                   Prisma client
+  dal/                  data access (server-only)
+src/app/actions/        Server Actions (auth, contact, quote)
+src/middleware.ts       Admin session gate
 ```
 
-## Public routes
+## Company identity
 
-| Path | Description |
-|------|-------------|
-| `/` | Editorial homepage |
-| `/about` | Company overview, values, HSE placeholders |
-| `/services` | Service index |
-| `/services/[slug]` | Service detail |
-| `/projects` | Portfolio with category filters + search |
-| `/projects/[slug]` | Project case study |
-| `/team` | Leadership placeholders |
-| `/insights` | Article index |
-| `/insights/[slug]` | Article detail |
-| `/contact` | Contact details + form |
-| `/request-a-quote` | Multi-step quote form |
-| `/careers` | Empty state |
-| `/privacy`, `/terms` | Draft legal placeholders |
+Branded as **Amani Construction Ltd**. Update contact details and legal copy in Site Settings (DB) or seed before launch. Have legal counsel review Privacy/Terms.
 
-## Admin routes
+## License
 
-| Path | Description |
-|------|-------------|
-| `/admin/login` | Demo sign-in |
-| `/admin` | Dashboard KPIs + recent inquiries |
-| `/admin/projects` | Table, search, status filter |
-| `/admin/projects/new` | New project form skeleton |
-| `/admin/projects/[id]` | Edit project form |
-| `/admin/services` | List + publish toggle |
-| `/admin/inquiries` | Table + detail panel, status change, notes |
-| `/admin/team` | Cards + publish toggle |
-| `/admin/settings` | Company fields (localStorage) |
-| `/admin/testimonials`, `/insights`, `/media`, `/pages`, `/seo`, `/users` | Module shells |
-
-## Design system
-
-- **Palette:** charcoal `#111315`, graphite `#252A2D`, off-white `#F4F2ED`, concrete `#D8D5CE`, amber `#C9953B`
-- **Fonts:** Manrope (display), Inter (body) via `next/font`
-- Tokens in `tailwind.config.ts` and `src/app/globals.css`
-
-## Mock data
-
-All content under `src/lib/mock-data/`. Company identity uses placeholders (`[Company Name]`, etc.). Sample projects, team names, and articles are **demo only**.
-
-## Demo-only behaviours
-
-- Forms validate and show success states locally; nothing is POSTed
-- Admin status/notes/publish toggles update React state (and settings use localStorage)
-- Login accepts any credentials
-- Image “uploads” are not connected to storage
-- No real email, CRM, maps, or WhatsApp integration
-
-## Backend handoff checklist
-
-- Replace mock repositories with typed API/database adapters
-- Connect inquiry and quote forms to validated server endpoints
-- Add real authentication and role permissions
-- Connect image/document uploads to object storage
-- Email notifications, audit logging, rate limiting, observability
-- Verified SEO content and structured data
-
-## Notes
-
-- Initial market assumption: Tanzania / East Africa — copy stays neutral and editable
-- Structured for future Swahili localization
-- Target WCAG 2.2 AA practices: semantics, focus, labels, reduced-motion
+Proprietary — Amani Construction Ltd.

@@ -1,25 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { loginAction } from "@/app/actions/auth";
 import { siteSettings } from "@/lib/mock-data";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("demo@example.com");
-  const [password, setPassword] = useState("demo");
-  const [show, setShow] = useState(false);
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/admin";
   const [error, setError] = useState("");
+  const [show, setShow] = useState(false);
+  const [pending, startTransition] = useTransition();
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError("Enter email and password");
-      return;
-    }
-    // Demo only — no real auth
-    router.push("/admin");
+    setError("");
+    const formData = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const result = await loginAction(null, formData);
+      if (result.ok) {
+        router.push(next);
+        router.refresh();
+      } else {
+        setError(result.error);
+      }
+    });
   };
 
   return (
@@ -31,8 +38,8 @@ export default function AdminLoginPage() {
         <h1 className="mt-2 text-center text-xl font-semibold text-slate-900">
           Admin sign in
         </h1>
-        <p className="mt-2 text-center text-xs text-amber-700 bg-amber-50 rounded px-2 py-1">
-          Demo mode — any credentials work. No real authentication.
+        <p className="mt-2 text-center text-sm text-slate-500">
+          Authorised staff only
         </p>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
@@ -40,9 +47,10 @@ export default function AdminLoginPage() {
               Email
             </label>
             <input
+              name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="username"
               className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
           </div>
@@ -52,9 +60,11 @@ export default function AdminLoginPage() {
             </label>
             <div className="relative mt-1">
               <input
+                name="password"
                 type={show ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                minLength={8}
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
               />
               <button
@@ -73,9 +83,10 @@ export default function AdminLoginPage() {
           )}
           <button
             type="submit"
-            className="w-full rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
+            disabled={pending}
+            className="w-full rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
           >
-            Sign in
+            {pending ? "Signing in…" : "Sign in"}
           </button>
         </form>
         <p className="mt-6 text-center text-xs text-slate-500">

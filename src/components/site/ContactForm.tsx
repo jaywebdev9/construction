@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { submitContactAction } from "@/app/actions/contact";
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your name"),
@@ -15,7 +16,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const [reference, setReference] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -25,22 +27,29 @@ export function ContactForm() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = async () => {
-    await new Promise((r) => setTimeout(r, 600));
-    setSubmitted(true);
-    reset();
+  const onSubmit = async (data: FormData) => {
+    setServerError(null);
+    const result = await submitContactAction(data);
+    if (result.ok) {
+      setReference(result.reference);
+      reset();
+    } else {
+      setServerError(result.error);
+    }
   };
 
-  if (submitted) {
+  if (reference) {
     return (
       <div className="rounded-sm border border-amber/30 bg-amber-50 p-6 text-center">
-        <p className="font-medium text-charcoal">Message received (demo)</p>
+        <p className="font-medium text-charcoal">Message received</p>
         <p className="mt-2 text-sm text-charcoal/70">
-          This is a frontend simulation. No data was sent to a server.
+          Your reference number is{" "}
+          <strong className="text-charcoal">{reference}</strong>. We will respond
+          shortly.
         </p>
         <button
           type="button"
-          onClick={() => setSubmitted(false)}
+          onClick={() => setReference(null)}
           className="btn-ghost mt-4"
         >
           Send another
@@ -112,6 +121,11 @@ export function ContactForm() {
           </p>
         )}
       </div>
+      {serverError && (
+        <p className="text-sm text-red-600" role="alert">
+          {serverError}
+        </p>
+      )}
       <button type="submit" className="btn-primary" disabled={isSubmitting}>
         {isSubmitting ? "Sending…" : "Send message"}
       </button>
