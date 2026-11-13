@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  eslint: {
+    // Typecheck still runs; ESLint errors won't block deploy if config drifts
+    ignoreDuringBuilds: false,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
 };
 
 export default nextConfig;
